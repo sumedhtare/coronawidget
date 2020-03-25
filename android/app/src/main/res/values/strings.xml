@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">corona</string>
+    <string name="appwidget_text">Infected: </string>
+    <string name="add_widget">Add widget</string>
+</resources>
