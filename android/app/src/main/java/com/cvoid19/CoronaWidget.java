@@ -3,6 +3,8 @@ package com.cvoid19;
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
+import android.content.ActivityNotFoundException;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
@@ -11,6 +13,7 @@ import android.view.View;
 import android.widget.ImageButton;
 import android.widget.RemoteViews;
 import android.content.SharedPreferences;
+import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -90,6 +93,25 @@ public class CoronaWidget extends AppWidgetProvider {
 
             getdata(context, appWidgetManager, appWidgetId);
 
+            try {
+                Intent intent = new Intent("android.intent.action.MAIN");
+                intent.addCategory("android.intent.category.LAUNCHER");
+
+                intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+                intent.setComponent(new ComponentName(context.getPackageName(), MainActivity.class.getName()));
+                PendingIntent pendingIntent = PendingIntent.getActivity(
+                        context, 0, intent, 0);
+                RemoteViews views = new RemoteViews(context.getPackageName(),
+                         R.layout.corona_widget);
+                views.setOnClickPendingIntent(R.id.toapp, pendingIntent);
+                appWidgetManager.updateAppWidget(appWidgetId, views);
+            } catch (ActivityNotFoundException e) {
+                Toast.makeText(context.getApplicationContext(),
+                        "There was a problem loading the application: ",
+                        Toast.LENGTH_SHORT).show();
+            }
+
+
         }
 
 
@@ -103,31 +125,6 @@ public class CoronaWidget extends AppWidgetProvider {
     @Override
     public void onDisabled(Context context) {
         // Enter relevant functionality for when the last widget is disabled
-    }
-
-    public static void getdatafrominternet(Context context){
-        RequestQueue queue = Volley.newRequestQueue(context);
-        Log.d("Response", "loading");
-        String url = "https://thevirustracker.com/free-api?countryTotal=IN";
-
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
-                (Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
-
-                    @Override
-                    public void onResponse(JSONObject response) {
-//                        textView.setText("Response: " + response.toString());
-                        Log.d("Response", response.toString());
-                    }
-                }, new Response.ErrorListener() {
-
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        // TODO: Handle error
-                        Log.d("Response", error.toString());
-
-                    }
-                });
-        queue.add(jsonObjectRequest);
     }
 
     public static void getdata(Context context, AppWidgetManager appWidgetManager, int appWidgetId){
